@@ -6,4 +6,6 @@ part of 'png_data_dao.dart';
 // DaoGenerator
 // **************************************************************************
 
-mixin _$PngDataDaoMixin on DatabaseAccessor<AppDataBase> {}
+mixin _$PngDataDaoMixin on DatabaseAccessor<AppDataBase> {
+  $PngDataTableTable get pngDataTable => attachedDatabase.pngDataTable;
+}

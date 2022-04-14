@@ -1,45 +1,101 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:ra3_map_searcher/data/constant.dart';
 import 'package:ra3_map_searcher/ui/pages/search_page/search_page_controller.dart';
 import 'package:ra3_map_searcher/ui/widgets/cupertino_app_bar.dart';
+import 'package:ra3_map_searcher/ui/widgets/cupertino_divider.dart';
+import 'package:ra3_map_searcher/ui/widgets/dialogs.dart';
+import 'package:ra3_map_searcher/ui/widgets/list_card.dart';
 
 class SearchPage extends GetView<SearchPageController> {
-  SearchPage({Key? key}) : super(key: key);
-
-  final inputController = TextEditingController();
+  const SearchPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: CupertinoScrollbar(
-        child: CupertinoAppBar(
-          title: '搜索地图',
-          leading: _buildLeading(context),
-          tabBar: _buildSearchInput(context),
-          child: ListView(),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: CupertinoPageScaffold(
+          child: CupertinoScrollbar(
+            child: CupertinoAppBar(
+              title: '搜索地图',
+              actions: [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minSize: 0,
+                  child: const Icon(CupertinoIcons.refresh),
+                  onPressed: () {
+                    showCupertinoConfirmDialog(
+                            context: context,
+                            content: '是否更新数据库?',
+                            showCancel: true)
+                        .then((value) {
+                      if (value == true) {
+                        controller.reloadDatabase();
+                      }
+                    });
+                  },
+                )
+              ],
+              tabBarHeight: 40,
+              tabBar: _buildSearchInput(context),
+              automaticallyImplyLeading: false,
+              child: SmartRefresher(
+                controller: controller.refreshController,
+                enablePullDown: true,
+                enablePullUp: false,
+                onRefresh: controller.onRefresh,
+                onLoading: controller.onLoading,
+                child: Obx(() => ListView.separated(
+                      padding: const EdgeInsets.only(
+                        top: 40 + kCupertinoNavigatorBar + 5,
+                        left: 5,
+                        right: 5,
+                      ),
+                      itemCount: controller.searchResult.length,
+                      itemBuilder: (context, index) {
+                        // return Text(controller.searchResult[index].name);
+                        return ListExtendedCard(
+                          model: controller.searchResult[index],
+                          onTap: () {},
+                          dio: controller.client.dio,
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Padding(
+                          padding: EdgeInsets.only(
+                            right: 5,
+                            left: 140,
+                            // left: 5,
+                          ),
+                          child: CupertinoDivider(height: 5),
+                        );
+                      },
+                    )),
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  CupertinoBackLeading _buildLeading(BuildContext context) {
-    return CupertinoBackLeading(
-      onPressed: () async {
-        _onWillPop().then((value) {
-          if (value) {
-            Navigator.of(context).pop();
-          }
-        });
-      },
-    );
-  }
-
   Future<bool> _onWillPop() async {
-    if (controller.isSearchMode.value && controller.items.isNotEmpty) {
+    if (controller.isSearchMode.value && controller.searchResult.isNotEmpty) {
       controller.isSearchMode.value = false;
       controller.focusNode.unfocus();
       return false;
     }
+
+    if (DateTime.now().millisecondsSinceEpoch - controller.lastPressBack >
+        1000) {
+      controller.lastPressBack = DateTime.now().millisecondsSinceEpoch;
+      BotToast.showText(text: '再按一次退出应用');
+      return false;
+    }
+
     return true;
   }
 

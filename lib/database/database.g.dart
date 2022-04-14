@@ -185,6 +185,7 @@ class $TxtDataTableTable extends TxtDataTable
 class PngDataTableData extends DataClass
     implements Insertable<PngDataTableData> {
   final int id;
+  final String raw;
   final String name;
   final String uploader;
   final String qq;
@@ -195,6 +196,7 @@ class PngDataTableData extends DataClass
   final String bv;
   PngDataTableData(
       {required this.id,
+      required this.raw,
       required this.name,
       required this.uploader,
       required this.qq,
@@ -209,6 +211,8 @@ class PngDataTableData extends DataClass
     return PngDataTableData(
       id: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      raw: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}raw'])!,
       name: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       uploader: const StringType()
@@ -231,6 +235,7 @@ class PngDataTableData extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['raw'] = Variable<String>(raw);
     map['name'] = Variable<String>(name);
     map['uploader'] = Variable<String>(uploader);
     map['qq'] = Variable<String>(qq);
@@ -245,6 +250,7 @@ class PngDataTableData extends DataClass
   PngDataTableCompanion toCompanion(bool nullToAbsent) {
     return PngDataTableCompanion(
       id: Value(id),
+      raw: Value(raw),
       name: Value(name),
       uploader: Value(uploader),
       qq: Value(qq),
@@ -261,6 +267,7 @@ class PngDataTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PngDataTableData(
       id: serializer.fromJson<int>(json['id']),
+      raw: serializer.fromJson<String>(json['raw']),
       name: serializer.fromJson<String>(json['name']),
       uploader: serializer.fromJson<String>(json['uploader']),
       qq: serializer.fromJson<String>(json['qq']),
@@ -276,6 +283,7 @@ class PngDataTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'raw': serializer.toJson<String>(raw),
       'name': serializer.toJson<String>(name),
       'uploader': serializer.toJson<String>(uploader),
       'qq': serializer.toJson<String>(qq),
@@ -289,6 +297,7 @@ class PngDataTableData extends DataClass
 
   PngDataTableData copyWith(
           {int? id,
+          String? raw,
           String? name,
           String? uploader,
           String? qq,
@@ -299,6 +308,7 @@ class PngDataTableData extends DataClass
           String? bv}) =>
       PngDataTableData(
         id: id ?? this.id,
+        raw: raw ?? this.raw,
         name: name ?? this.name,
         uploader: uploader ?? this.uploader,
         qq: qq ?? this.qq,
@@ -312,6 +322,7 @@ class PngDataTableData extends DataClass
   String toString() {
     return (StringBuffer('PngDataTableData(')
           ..write('id: $id, ')
+          ..write('raw: $raw, ')
           ..write('name: $name, ')
           ..write('uploader: $uploader, ')
           ..write('qq: $qq, ')
@@ -326,12 +337,13 @@ class PngDataTableData extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(id, name, uploader, qq, type, players, size, time, bv);
+      Object.hash(id, raw, name, uploader, qq, type, players, size, time, bv);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PngDataTableData &&
           other.id == this.id &&
+          other.raw == this.raw &&
           other.name == this.name &&
           other.uploader == this.uploader &&
           other.qq == this.qq &&
@@ -344,6 +356,7 @@ class PngDataTableData extends DataClass
 
 class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
   final Value<int> id;
+  final Value<String> raw;
   final Value<String> name;
   final Value<String> uploader;
   final Value<String> qq;
@@ -354,6 +367,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
   final Value<String> bv;
   const PngDataTableCompanion({
     this.id = const Value.absent(),
+    this.raw = const Value.absent(),
     this.name = const Value.absent(),
     this.uploader = const Value.absent(),
     this.qq = const Value.absent(),
@@ -365,6 +379,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
   });
   PngDataTableCompanion.insert({
     this.id = const Value.absent(),
+    required String raw,
     required String name,
     required String uploader,
     required String qq,
@@ -373,7 +388,8 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
     required String size,
     required String time,
     required String bv,
-  })  : name = Value(name),
+  })  : raw = Value(raw),
+        name = Value(name),
         uploader = Value(uploader),
         qq = Value(qq),
         type = Value(type),
@@ -383,6 +399,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
         bv = Value(bv);
   static Insertable<PngDataTableData> custom({
     Expression<int>? id,
+    Expression<String>? raw,
     Expression<String>? name,
     Expression<String>? uploader,
     Expression<String>? qq,
@@ -394,6 +411,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (raw != null) 'raw': raw,
       if (name != null) 'name': name,
       if (uploader != null) 'uploader': uploader,
       if (qq != null) 'qq': qq,
@@ -407,6 +425,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
 
   PngDataTableCompanion copyWith(
       {Value<int>? id,
+      Value<String>? raw,
       Value<String>? name,
       Value<String>? uploader,
       Value<String>? qq,
@@ -417,6 +436,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
       Value<String>? bv}) {
     return PngDataTableCompanion(
       id: id ?? this.id,
+      raw: raw ?? this.raw,
       name: name ?? this.name,
       uploader: uploader ?? this.uploader,
       qq: qq ?? this.qq,
@@ -433,6 +453,9 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (raw.present) {
+      map['raw'] = Variable<String>(raw.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -465,6 +488,7 @@ class PngDataTableCompanion extends UpdateCompanion<PngDataTableData> {
   String toString() {
     return (StringBuffer('PngDataTableCompanion(')
           ..write('id: $id, ')
+          ..write('raw: $raw, ')
           ..write('name: $name, ')
           ..write('uploader: $uploader, ')
           ..write('qq: $qq, ')
@@ -491,6 +515,11 @@ class $PngDataTableTable extends PngDataTable
       type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
+  final VerificationMeta _rawMeta = const VerificationMeta('raw');
+  @override
+  late final GeneratedColumn<String?> raw = GeneratedColumn<String?>(
+      'raw', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
@@ -533,7 +562,7 @@ class $PngDataTableTable extends PngDataTable
       type: const StringType(), requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, uploader, qq, type, players, size, time, bv];
+      [id, raw, name, uploader, qq, type, players, size, time, bv];
   @override
   String get aliasedName => _alias ?? 'png_data_table';
   @override
@@ -545,6 +574,12 @@ class $PngDataTableTable extends PngDataTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('raw')) {
+      context.handle(
+          _rawMeta, raw.isAcceptableOrUnknown(data['raw']!, _rawMeta));
+    } else if (isInserting) {
+      context.missing(_rawMeta);
     }
     if (data.containsKey('name')) {
       context.handle(

@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:ra3_map_searcher/data/constant.dart';
 import 'package:ra3_map_searcher/ui/themes/colors.dart';
 
