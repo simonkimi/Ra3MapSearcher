@@ -2,78 +2,79 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:ra3_map_searcher/data/constant.dart';
 import 'package:ra3_map_searcher/ui/pages/search_page/search_page_controller.dart';
 import 'package:ra3_map_searcher/ui/widgets/cupertino_app_bar.dart';
 import 'package:ra3_map_searcher/ui/widgets/cupertino_divider.dart';
 import 'package:ra3_map_searcher/ui/widgets/dialogs.dart';
 import 'package:ra3_map_searcher/ui/widgets/list_card.dart';
+import 'package:ra3_map_searcher/ui/widgets/slivers.dart';
 
 class SearchPage extends GetView<SearchPageController> {
   const SearchPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: WillPopScope(
-        onWillPop: _onWillPop,
-        child: CupertinoPageScaffold(
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: CupertinoPageScaffold(
+        child: CupertinoAppBar(
+          title: '搜索地图',
+          actions: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              minSize: 0,
+              child: const Icon(CupertinoIcons.refresh),
+              onPressed: () {
+                showCupertinoConfirmDialog(
+                    context: context,
+                    content: '是否更新数据库?',
+                    showCancel: true)
+                    .then((value) {
+                  if (value == true) {
+                    controller.reloadDatabase();
+                  }
+                });
+              },
+            )
+          ],
+          tabBarHeight: 40,
+          tabBar: _buildSearchInput(context),
+          automaticallyImplyLeading: false,
           child: CupertinoScrollbar(
-            child: CupertinoAppBar(
-              title: '搜索地图',
-              actions: [
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minSize: 0,
-                  child: const Icon(CupertinoIcons.refresh),
-                  onPressed: () {
-                    showCupertinoConfirmDialog(
-                            context: context,
-                            content: '是否更新数据库?',
-                            showCancel: true)
-                        .then((value) {
-                      if (value == true) {
-                        controller.reloadDatabase();
-                      }
-                    });
-                  },
-                )
-              ],
-              tabBarHeight: 40,
-              tabBar: _buildSearchInput(context),
-              automaticallyImplyLeading: false,
-              child: SmartRefresher(
-                controller: controller.refreshController,
-                enablePullDown: true,
-                enablePullUp: false,
-                onRefresh: controller.onRefresh,
-                onLoading: controller.onLoading,
-                child: Obx(() => ListView.separated(
-                      padding: const EdgeInsets.only(
-                        top: 40 + kCupertinoNavigatorBar + 5,
-                        left: 5,
-                        right: 5,
-                      ),
-                      itemCount: controller.searchResult.length,
-                      itemBuilder: (context, index) {
-                        // return Text(controller.searchResult[index].name);
-                        return ListExtendedCard(
-                          model: controller.searchResult[index],
-                          onTap: () {},
-                          dio: controller.client.dio,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Padding(
-                          padding: EdgeInsets.only(
-                            right: 5,
-                            left: 140,
-                            // left: 5,
+            child: SmartRefresher(
+              controller: controller.refreshController,
+              enablePullDown: false,
+              enablePullUp: false,
+              onLoading: controller.onLoading,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPullToRefresh(
+                      extraHeight: 45,
+                      onRefresh: controller.onRefresh,
+                    ),
+                    SliverList(
+                        delegate: SliverChildDividerBuilderDelegate(
+                          itemCount: controller.searchResult.length,
+                          divider: const Padding(
+                            padding: EdgeInsets.only(
+                              right: 5,
+                              left: 140,
+                              // left: 5,
+                            ),
+                            child: CupertinoDivider(height: 5),
                           ),
-                          child: CupertinoDivider(height: 5),
-                        );
-                      },
-                    )),
+                          builder: (context, index) {
+                            return ListExtendedCard(
+                              model: controller.searchResult[index],
+                              onTap: () {},
+                              dio: controller.client.dio,
+                            );
+                          },
+                        )),
+                  ],
+                ),
               ),
             ),
           ),

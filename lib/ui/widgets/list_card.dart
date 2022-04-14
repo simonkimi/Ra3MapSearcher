@@ -75,6 +75,31 @@ class ListExtendedCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 3),
+        _buildType(context),
+      ],
+    );
+  }
+
+  Widget _buildType(BuildContext context) {
+    return Wrap(
+      spacing: 3,
+      runSpacing: 3,
+      children: [
+        Badge(
+          text:
+              model.players.endsWith('人') ? model.players : '${model.players}人',
+          fontSize: 12,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          color: CupertinoColors.systemTeal,
+        ),
+        ...model.type.split('&').map((type) {
+          return Badge(
+            text: type,
+            fontSize: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            color: typeColor(type),
+          );
+        }).toList(),
       ],
     );
   }
@@ -98,35 +123,11 @@ class ListExtendedCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            ExtendedImage(
-              image: DioImageProvider(
-                url: 'static/map/${model.raw}',
-                dio: dio,
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(3),
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.black.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Text(
-                    model.players.endsWith('人') ? model.players : '${model.players}人',
-                    style: const TextStyle(
-                      color: CupertinoColors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: ExtendedImage(
+          image: DioImageProvider(
+            url: 'static/map/${model.raw}',
+            dio: dio,
+          ),
         ),
       ),
     );
@@ -140,13 +141,7 @@ class ListExtendedCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Column(
-            children: [
-              Badge(
-                text: model.type,
-                fontSize: 12,
-                color: CupertinoColors.systemBlue,
-              ),
-            ],
+            children: [],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,

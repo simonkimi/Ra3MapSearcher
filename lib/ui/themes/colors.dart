@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class FixColor {
   FixColor._();
@@ -51,4 +52,29 @@ bool isDarkMode(BuildContext context) =>
 
 extension ColorHelper on Color {
   bool get isDark => red * 0.299 + green * 0.578 + blue * 0.114 <= 192;
+}
+
+Color? typeColor(String value) {
+  final types = [
+    '塔防',
+    '对战',
+    '娱乐',
+    '执政官',
+    '战役',
+    '进攻',
+    'mod地图',
+    '无限钱',
+    '闯关',
+    '流线',
+    'REMIX',
+    '日冕',
+    '防守',
+    '海战',
+    '虐电',
+    '挑战'
+  ];
+
+  final index = types.indexOf(value);
+  if (index == -1) return null;
+  return Colors.primaries[index % Colors.primaries.length];
 }
