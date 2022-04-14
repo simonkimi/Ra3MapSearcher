@@ -5,6 +5,8 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:ra3_map_searcher/database/daos/png_data_dao.dart';
+import 'package:ra3_map_searcher/database/daos/txt_data_dao.dart';
 import 'package:ra3_map_searcher/database/tables/png_data_table.dart';
 import 'package:ra3_map_searcher/database/tables/txt_data_table.dart';
 
@@ -30,7 +32,9 @@ LazyDatabase _openConnection() {
 }
 
 @DriftDatabase(
-    tables: [TxtDataTable, PngDataTable], daos: [TxtDataTable, PngDataTable])
+  tables: [TxtDataTable, PngDataTable],
+  daos: [TxtDataDao, PngDataDao],
+)
 class AppDataBase extends _$AppDataBase {
   AppDataBase() : super(_openConnection());
 
@@ -45,4 +49,8 @@ class DB {
 
   static final DB _db = DB._();
   final AppDataBase _database = AppDataBase();
+
+  PngDataDao get pngDataDao => _database.pngDataDao;
+
+  TxtDataDao get txtDataDao => _database.txtDataDao;
 }
