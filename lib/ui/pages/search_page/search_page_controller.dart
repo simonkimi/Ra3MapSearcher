@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:ra3_map_searcher/database/database.dart';
 import 'package:ra3_map_searcher/network/client.dart';
+import 'package:ra3_map_searcher/utils/debug.dart';
 
 class SearchPageController extends GetxController {
   final focusNode = FocusNode();
@@ -20,8 +21,10 @@ class SearchPageController extends GetxController {
   final client = Client();
 
   Future<void> onSearchSubmit(String value) async {
+    final time = TimeLine();
     searchResult.clear();
     searchResult.addAll(await DB().pngDataDao.search(value));
+    time.getRunTime();
   }
 
   Future<void> reloadDatabase() async {

@@ -1,13 +1,14 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:ra3_map_searcher/data/constant.dart';
 import 'package:ra3_map_searcher/ui/pages/search_page/search_page_controller.dart';
 import 'package:ra3_map_searcher/ui/widgets/cupertino_app_bar.dart';
-import 'package:ra3_map_searcher/ui/widgets/cupertino_divider.dart';
 import 'package:ra3_map_searcher/ui/widgets/dialogs.dart';
 import 'package:ra3_map_searcher/ui/widgets/list_card.dart';
 import 'package:ra3_map_searcher/ui/widgets/slivers.dart';
+
+import '../../widgets/cupertino_divider.dart';
 
 class SearchPage extends GetView<SearchPageController> {
   const SearchPage({Key? key}) : super(key: key);
@@ -19,63 +20,40 @@ class SearchPage extends GetView<SearchPageController> {
       child: CupertinoPageScaffold(
         child: CupertinoAppBar(
           title: '搜索地图',
-          actions: [
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              minSize: 0,
-              child: const Icon(CupertinoIcons.refresh),
-              onPressed: () {
-                showCupertinoConfirmDialog(
-                    context: context,
-                    content: '是否更新数据库?',
-                    showCancel: true)
-                    .then((value) {
-                  if (value == true) {
-                    controller.reloadDatabase();
-                  }
-                });
-              },
-            )
-          ],
-          tabBarHeight: 40,
+          actions: _buildActions(context),
+          tabBarHeight: kSuggestInputHeight,
           tabBar: _buildSearchInput(context),
           automaticallyImplyLeading: false,
           child: CupertinoScrollbar(
-            child: SmartRefresher(
-              controller: controller.refreshController,
-              enablePullDown: false,
-              enablePullUp: false,
-              onLoading: controller.onLoading,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPullToRefresh(
-                      extraHeight: 45,
-                      onRefresh: controller.onRefresh,
-                    ),
-                    SliverList(
-                        delegate: SliverChildDividerBuilderDelegate(
-                          itemCount: controller.searchResult.length,
-                          divider: const Padding(
-                            padding: EdgeInsets.only(
-                              right: 5,
-                              left: 140,
-                              // left: 5,
-                            ),
-                            child: CupertinoDivider(height: 5),
-                          ),
-                          builder: (context, index) {
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Obx(() => CustomScrollView(
+                    slivers: [
+                      const SliverSafeAreaPadding(extraHeight: 45),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index.isOdd) {
+                              return const Padding(
+                                padding: EdgeInsets.only(
+                                  right: 5,
+                                  left: 135,
+                                  // left: 5,
+                                ),
+                                child: CupertinoDivider(height: 5),
+                              );
+                            }
+
                             return ListExtendedCard(
-                              model: controller.searchResult[index],
+                              model: controller.searchResult[index ~/ 2],
                               onTap: () {},
-                              dio: controller.client.dio,
                             );
                           },
-                        )),
-                  ],
-                ),
-              ),
+                          childCount: controller.searchResult.length * 2,
+                        ),
+                      ),
+                    ],
+                  )),
             ),
           ),
         ),
@@ -102,7 +80,7 @@ class SearchPage extends GetView<SearchPageController> {
 
   Widget _buildSearchInput(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: kSuggestInputHeight,
       child: Padding(
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
         child: CupertinoTextField(
@@ -138,5 +116,24 @@ class SearchPage extends GetView<SearchPageController> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildActions(BuildContext context) {
+    return [
+      CupertinoButton(
+        padding: EdgeInsets.zero,
+        minSize: 0,
+        child: const Icon(CupertinoIcons.refresh),
+        onPressed: () {
+          showCupertinoConfirmDialog(
+                  context: context, content: '是否更新数据库?', showCancel: true)
+              .then((value) {
+            if (value == true) {
+              controller.reloadDatabase();
+            }
+          });
+        },
+      )
+    ];
   }
 }

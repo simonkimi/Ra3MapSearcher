@@ -1,29 +1,28 @@
-import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ra3_map_searcher/database/database.dart';
+import 'package:ra3_map_searcher/network/client.dart';
 import 'package:ra3_map_searcher/ui/themes/colors.dart';
 import 'package:ra3_map_searcher/ui/widgets/badge.dart';
-import 'package:ra3_map_searcher/ui/widgets/image_provider.dart';
+
 
 class ListExtendedCard extends StatelessWidget {
   const ListExtendedCard({
     Key? key,
     required this.model,
     required this.onTap,
-    required this.dio,
   }) : super(key: key);
 
   final PngDataTableData model;
   final VoidCallback onTap;
-  final Dio dio;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: IntrinsicHeight(
+    return SizedBox(
+      height: 130,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
         child: Row(
           children: [
             _buildLeftImage(context),
@@ -108,7 +107,6 @@ class ListExtendedCard extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1,
       child: Container(
-        width: 130,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
@@ -123,11 +121,18 @@ class ListExtendedCard extends StatelessWidget {
             ),
           ],
         ),
-        child: ExtendedImage(
-          image: DioImageProvider(
-            url: 'static/map/${model.raw}',
-            dio: dio,
-          ),
+        child: ExtendedImage.network(
+          '${baseUrl}static/map/${model.raw}',
+          cache: true,
+          loadStateChanged: (state) {
+            switch (state.extendedImageLoadState) {
+              case LoadState.loading:
+                return const CupertinoActivityIndicator();
+              case LoadState.completed:
+              case LoadState.failed:
+                return null;
+            }
+          },
         ),
       ),
     );
@@ -140,31 +145,22 @@ class ListExtendedCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Column(
-            children: [],
+          Text(
+            model.size.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.5,
+              height: 1.1,
+              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                model.size,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  height: 1.1,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                ),
-              ),
-              Text(
-                model.time,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                ),
-              ),
-            ],
-          )
+          Text(
+            model.time,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            ),
+          ),
         ],
       ),
     );

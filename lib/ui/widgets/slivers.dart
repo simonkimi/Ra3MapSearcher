@@ -3,6 +3,27 @@ import 'package:ra3_map_searcher/data/constant.dart';
 
 import 'cupertino_divider.dart';
 
+class SliverSafeAreaPadding extends StatelessWidget {
+  const SliverSafeAreaPadding({
+    Key? key,
+    required this.extraHeight,
+  }) : super(key: key);
+
+  final double extraHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top +
+            kCupertinoNavigatorBar +
+            extraHeight,
+      ),
+      sliver: const SliverToBoxAdapter(child: SizedBox()),
+    );
+  }
+}
+
 class SliverPullToRefresh extends StatelessWidget {
   const SliverPullToRefresh({
     Key? key,
@@ -35,9 +56,11 @@ class SliverPullToRefresh extends StatelessWidget {
   }
 }
 
+
+
+
 class SliverChildDividerBuilderDelegate extends SliverChildBuilderDelegate {
-  SliverChildDividerBuilderDelegate({
-    required NullableIndexedWidgetBuilder builder,
+  SliverChildDividerBuilderDelegate(NullableIndexedWidgetBuilder builder, {
     required this.itemCount,
     this.divider,
   }) : super(builder, childCount: itemCount * 2 - 1);

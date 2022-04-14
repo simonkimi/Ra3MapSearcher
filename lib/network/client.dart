@@ -1,10 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_http_formatter/dio_http_formatter.dart';
-import 'package:get/get.dart';
-import 'package:ra3_map_searcher/data/global_controller.dart';
 
 import 'entities.json.dart';
 
@@ -12,12 +8,7 @@ const baseUrl = 'http://47.107.50.177/';
 
 class Client {
   final _dio = Dio()
-    ..options.baseUrl = baseUrl
-    ..interceptors.addAll([
-      DioCacheInterceptor(
-          options: Get.find<GlobalController>().cacheOptions),
-      HttpFormatter(includeResponseBody: false),
-    ]);
+    ..options.baseUrl = baseUrl;
 
   Future<DataRoot> getData() async {
     final rsp = await _dio.get<String>('data.json');
